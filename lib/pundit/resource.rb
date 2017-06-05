@@ -82,7 +82,7 @@ module Pundit
 
         # Don't rely on policy.show? being defined since it isn't used for
         # show actions directly and should always have the same behaviour.
-        if record && show?(Pundit.policy!(context[:current_user], record), record.id)
+        if record && show?(Pundit.policy!(context[:current_user], record), record, record.id)
           record
         else
           nil
@@ -98,7 +98,9 @@ module Pundit
     end
 
     def show?(policy, record_id)
-      policy.scope.where(id: record_id).exists?
+      q = {}
+      q[record.class.primary_key] = record_id
+      policy.scope.where(q).exists?
     end
   end
 end
